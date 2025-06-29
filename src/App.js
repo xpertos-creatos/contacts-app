@@ -1,23 +1,78 @@
-import logo from './logo.svg';
+import React, { useState, useEffect } from 'react';
+import { supabase } from './supabaseClient';
+import Auth from './components/Auth';
+import ContactsApp from './components/ContactsApp';
 import './App.css';
 
 function App() {
+  // Estado para guardar la sesión del usuario
+  const [session, setSession] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // useEffect para verificar la sesión al cargar la app
+  useEffect(() => {
+    // Obtener sesión inicial
+    getSession();
+
+    // Escuchar cambios de autenticación
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        console.log('Auth event:', event);
+        setSession(session);
+        setLoading(false);
+      }
+    );
+
+    // Cleanup: remover listener cuando el componente se desmonte
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Función para obtener la sesión actual
+  async function getSession() {
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      
+      if (error) throw error;
+      
+      setSession(session);
+    } catch (error) {
+      console.error('Error getting session:', error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Mostrar loading mientras verifica la sesión
+  if (loading) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+        background: '#282c34',
+        color: 'white'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <h2>⏳ Cargando...</h2>
+          <p>Verificando sesión de usuario</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {/* 
+        Lógica principal:
+        - Si NO hay sesión → Mostrar Auth (login/signup)
+        - Si SÍ hay sesión → Mostrar ContactsApp
+      */}
+      {!session ? (
+        <Auth />
+      ) : (
+        <ContactsApp user={session.user} />
+      )}
     </div>
   );
 }
