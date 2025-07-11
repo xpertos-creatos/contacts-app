@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 
+/**
+ * Componente principal para la gestión de contactos y empresas.
+ * Permite CRUD (Crear, Leer, Actualizar, Eliminar) operaciones para contactos y empresas.
+ * @param {object} props - Propiedades del componente.
+ * @param {object} props.user - Objeto de usuario autenticado de Supabase.
+ * @returns {JSX.Element} El componente ContactsApp renderizado.
+ */
 function ContactsApp({ user }) {
   // Estados para contactos
   const [contacts, setContacts] = useState([]);
@@ -39,12 +46,21 @@ function ContactsApp({ user }) {
   // Estados para pestañas
   const [activeTab, setActiveTab] = useState('contacts'); // 'contacts' o 'companies'
 
+  /**
+   * useEffect hook para cargar los datos iniciales (contactos y empresas)
+   * cuando el componente se monta.
+   */
   // Cargar datos al iniciar
   useEffect(() => {
     fetchContacts();
     fetchCompanies();
   }, []);
 
+  /**
+   * Obtiene la lista de contactos del usuario desde Supabase,
+   * incluyendo información de la empresa asociada (JOIN).
+   * @async
+   */
   // Función para obtener contactos con información de empresa (JOIN)
   async function fetchContacts() {
     try {
@@ -72,6 +88,10 @@ function ContactsApp({ user }) {
     }
   }
 
+  /**
+   * Obtiene la lista de empresas del usuario desde Supabase.
+   * @async
+   */
   // Función para obtener empresas
   async function fetchCompanies() {
     try {
@@ -91,6 +111,11 @@ function ContactsApp({ user }) {
     }
   }
 
+  /**
+   * Maneja el envío del formulario para crear una nueva empresa.
+   * @async
+   * @param {React.FormEvent<HTMLFormElement>} e - El evento del formulario.
+   */
   // Función para crear una nueva empresa
   async function handleCompanySubmit(e) {
     e.preventDefault();
@@ -133,6 +158,10 @@ function ContactsApp({ user }) {
     }
   }
 
+  /**
+   * Maneja los cambios en los campos del formulario de creación/edición de contactos.
+   * @param {React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>} e - El evento de cambio.
+   */
   // Función para manejar cambios en el formulario de contactos
   function handleInputChange(e) {
     const { name, value } = e.target;
@@ -142,6 +171,10 @@ function ContactsApp({ user }) {
     }));
   }
 
+  /**
+   * Maneja los cambios en los campos del formulario de creación de empresas.
+   * @param {React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>} e - El evento de cambio.
+   */
   // Función para manejar cambios en el formulario de empresas
   function handleCompanyInputChange(e) {
     const { name, value } = e.target;
@@ -151,6 +184,11 @@ function ContactsApp({ user }) {
     }));
   }
 
+  /**
+   * Maneja el envío del formulario para crear un nuevo contacto.
+   * @async
+   * @param {React.FormEvent<HTMLFormElement>} e - El evento del formulario.
+   */
   // Función para crear un nuevo contacto
   async function handleSubmit(e) {
     e.preventDefault();
@@ -195,6 +233,13 @@ function ContactsApp({ user }) {
     }
   }
 
+  /**
+   * Elimina un contacto específico de Supabase.
+   * Pide confirmación al usuario antes de eliminar.
+   * @async
+   * @param {string} contactId - El ID del contacto a eliminar.
+   * @param {string} contactName - El nombre del contacto a eliminar (para mensaje de confirmación).
+   */
   // Función para eliminar un contacto
   async function handleDelete(contactId, contactName) {
     const confirmed = window.confirm(
@@ -220,6 +265,13 @@ function ContactsApp({ user }) {
     }
   }
 
+  /**
+   * Elimina una empresa específica de Supabase.
+   * Pide confirmación al usuario antes de eliminar.
+   * @async
+   * @param {string} companyId - El ID de la empresa a eliminar.
+   * @param {string} companyName - El nombre de la empresa a eliminar (para mensaje de confirmación).
+   */
   // Función para eliminar una empresa
   async function handleDeleteCompany(companyId, companyName) {
     const confirmed = window.confirm(
@@ -245,6 +297,10 @@ function ContactsApp({ user }) {
     }
   }
 
+  /**
+   * Activa el modo de edición para un contacto específico.
+   * @param {object} contact - El objeto de contacto a editar.
+   */
   // Función para activar modo edición
   function startEditing(contact) {
     setEditingId(contact.id);
@@ -257,12 +313,19 @@ function ContactsApp({ user }) {
     });
   }
 
+  /**
+   * Cancela el modo de edición y resetea los datos del formulario de edición.
+   */
   // Función para cancelar edición
   function cancelEditing() {
     setEditingId(null);
     setEditData({});
   }
 
+  /**
+   * Maneja los cambios en los campos del formulario de edición de contactos.
+   * @param {React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>} e - El evento de cambio.
+   */
   // Función para manejar cambios en edición
   function handleEditChange(e) {
     const { name, value } = e.target;
@@ -272,6 +335,11 @@ function ContactsApp({ user }) {
     }));
   }
 
+  /**
+   * Guarda los cambios realizados en un contacto editado.
+   * @async
+   * @param {string} contactId - El ID del contacto que se está editando.
+   */
   // Función para guardar cambios
   async function saveEdit(contactId) {
     try {
@@ -303,6 +371,11 @@ function ContactsApp({ user }) {
     }
   }
 
+  /**
+   * Filtra la lista de contactos basándose en el término de búsqueda (`searchTerm`).
+   * La búsqueda se realiza en nombre, email, teléfono, nombre de la empresa y notas.
+   * @type {object[]}
+   */
   // Función para filtrar contactos en tiempo real
   const filteredContacts = contacts.filter(contact => {
     const searchLower = searchTerm.toLowerCase();
@@ -315,11 +388,18 @@ function ContactsApp({ user }) {
     );
   });
 
+  /**
+   * Limpia el término de búsqueda, reseteando el filtro de contactos.
+   */
   // Función para limpiar búsqueda
   function clearSearch() {
     setSearchTerm('');
   }
 
+  /**
+   * Cierra la sesión del usuario actual utilizando Supabase.
+   * @async
+   */
   // Función para cerrar sesión
   async function handleSignOut() {
     try {

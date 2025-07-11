@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
 
+/**
+ * Componente de autenticación.
+ * Permite a los usuarios iniciar sesión o registrarse.
+ * @returns {JSX.Element} El componente Auth renderizado.
+ */
 function Auth() {
   // Estados para el formulario
   const [email, setEmail] = useState('');
@@ -8,6 +13,11 @@ function Auth() {
   const [loading, setLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false); // false = login, true = signup
 
+  /**
+   * Maneja el proceso de inicio de sesión del usuario.
+   * Utiliza Supabase para autenticar al usuario con email y contraseña.
+   * @async
+   */
   // Función para manejar el login
   async function handleLogin() {
     try {
@@ -29,6 +39,11 @@ function Auth() {
     }
   }
 
+  /**
+   * Maneja el proceso de registro de un nuevo usuario.
+   * Utiliza Supabase para registrar al usuario con email y contraseña.
+   * @async
+   */
   // Función para manejar el registro
   async function handleSignUp() {
     try {
@@ -50,6 +65,11 @@ function Auth() {
     }
   }
 
+  /**
+   * Maneja el envío del formulario de autenticación.
+   * Llama a `handleSignUp` o `handleLogin` dependiendo del estado de `isSignUp`.
+   * @param {React.FormEvent<HTMLFormElement>} e - El evento del formulario.
+   */
   // Función que se ejecuta cuando el usuario envía el formulario
   function handleSubmit(e) {
     e.preventDefault(); // Evitar que la página se recargue

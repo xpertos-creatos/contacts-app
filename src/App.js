@@ -4,11 +4,20 @@ import Auth from './components/Auth';
 import ContactsApp from './components/ContactsApp';
 import './App.css';
 
+/**
+ * Componente principal de la aplicación.
+ * Maneja la autenticación del usuario y renderiza la interfaz de usuario apropiada.
+ * @returns {JSX.Element} El componente App renderizado.
+ */
 function App() {
   // Estado para guardar la sesión del usuario
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  /**
+   * useEffect hook to manage user session.
+   * It fetches the current session on component mount and listens for auth state changes.
+   */
   // useEffect para verificar la sesión al cargar la app
   useEffect(() => {
     // Obtener sesión inicial
@@ -27,6 +36,11 @@ function App() {
     return () => subscription.unsubscribe();
   }, []);
 
+  /**
+   * Obtiene la sesión actual del usuario desde Supabase.
+   * Actualiza el estado de `session` y `loading`.
+   * @async
+   */
   // Función para obtener la sesión actual
   async function getSession() {
     try {
